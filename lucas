@@ -1,0 +1,320 @@
+#include <stdio.h>
+#include <malloc.h>
+#include <stdlib.h>
+
+#define clrscr() system("@cls||clear");
+
+// 1- Escrever um procedimento que retira os valores múltiplos de 3 da pilha P1. Utilize uma pilha auxiliar.
+// 2- Escreva um procedimento que recebe 2 filas e retorna uma 3a fila com os valores maiores do que 10.
+
+struct itemPilha
+{
+    int dado;
+    struct itemPilha *proximo;
+};
+
+struct itemFila
+{
+    int dado;
+    struct itemFila *proximo;
+};
+
+void enfileirar(struct itemFila **fila, int valor)
+{
+    struct itemFila *aux;
+    struct itemFila *p = (struct itemFila *)malloc(sizeof(struct itemFila));
+    p->dado = valor;
+    p->proximo = NULL;
+    if (*fila == NULL)
+    {
+        *fila = p;
+    }
+    else
+    {
+        aux = *fila;
+        while (aux->proximo != NULL)
+        {
+            aux = aux->proximo;
+        }
+        aux->proximo = p;
+    }
+}
+
+int desenfileirar(struct itemFila **fila)
+{
+    int valor;
+    struct itemFila *aux;
+    aux = *fila;
+    valor = aux->dado;
+    *fila = aux->proximo;
+    free(aux);
+    return valor;
+}
+
+void inserirFila(struct itemFila **fila)
+{
+    int valor;
+    printf("\nDigite um valor para inserir na pilha: ");
+    scanf("%i", &valor);
+    enfileirar(fila, valor);
+}
+
+void listarFilas(struct itemFila *fila1, struct itemFila *fila2)
+{
+
+    int i = 0;
+
+    if (fila1 != NULL && fila2 != NULL)
+    {
+
+        printf("\nFila 1\n");
+
+        while (fila1)
+        {
+            printf("\n%i => %i", i, fila1->dado);
+            fila1 = fila1->proximo;
+            i++;
+        }
+
+        printf("\n\nFila 2\n");
+        i = 0;
+
+        while (fila2)
+        {
+            printf("\n%i => %i", i, fila2->dado);
+            fila2 = fila2->proximo;
+            i++;
+        }
+    }
+    else
+    {
+        printf("\nExistem filas vazias");
+    }
+
+    printf("\n");
+}
+
+void listarFila(struct itemFila *fila)
+{
+
+    clrscr();
+
+    int i = 0;
+    if (fila)
+    {
+        printf("\nFila com maiores que 10: ");
+
+        while (fila)
+        {
+            printf("\n%i => %i", i, fila->dado);
+            fila = fila->proximo;
+            i++;
+        }
+
+        printf("\n");
+    }
+    else
+        printf("\nFila Vazia");
+}
+
+void maioresQue10(struct itemFila **fila1, struct itemFila **fila2)
+{
+
+    struct itemFila *aux, *fila3 = NULL;
+
+    //Remover da fila 1
+    while (*fila1)
+    {
+        aux = (*fila1)->proximo;
+        if ((*fila1)->dado > 10)
+        {
+            enfileirar(&fila3, desenfileirar(fila1));
+        }
+        else
+        {
+            desenfileirar(fila1);
+        }
+        *fila1 = aux;
+    }
+
+    //Remover da fila 2
+    while (*fila2)
+    {
+        aux = (*fila2)->proximo;
+        if ((*fila2)->dado > 10)
+        {
+            enfileirar(&fila3, desenfileirar(fila2));
+        }
+        else
+        {
+            desenfileirar(fila2);
+        }
+        *fila2 = aux;
+    }
+
+    //Printar fila 3
+    listarFila(fila3);
+}
+
+void ex2()
+{
+
+    clrscr();
+
+    int op, status;
+    struct itemFila *fila1 = NULL, *fila2 = NULL;
+
+    do
+    {
+
+        printf("\nMenu - Exercicio 2");
+        printf("\n1) Inserir dado na fila 1");
+        printf("\n2) Inserir dado na fila 2");
+        printf("\n3) Listar filas");
+        printf("\n4) Pegar valores maiores que 10 das duas filas");
+        printf("\n0) Voltar para o menu principal");
+        printf("\nOpcao: ");
+        scanf("%i", &op);
+
+        switch (op)
+        {
+        case 1:
+            inserirFila(&fila1);
+            break;
+        case 2:
+            inserirFila(&fila2);
+            break;
+        case 3:
+            listarFilas(fila1, fila2);
+            break;
+        case 4:
+            maioresQue10(&fila1, &fila2);
+            break;
+        }
+
+    } while (op != 0);
+}
+
+void push(struct itemPilha **topo, int valor)
+{
+    struct itemPilha *p;
+    p = (struct itemPilha *)malloc(sizeof(struct itemPilha));
+    p->dado = valor;
+    p->proximo = *topo;
+    *topo = p;
+}
+
+int pop (struct itemPilha **topo){
+ int valor;
+ struct itemPilha *p;
+
+ valor = (*topo)->dado;
+ p = *topo;
+ *topo = p->proximo;
+ free(p);
+ 
+ 
+ return valor;
+}
+
+void inserirNaPilha(struct itemPilha **topo, int *status)
+{
+    int valor;
+    printf("\nDigite um valor para inserir na pilha: ");
+    scanf("%i", &valor);
+    push(topo, valor);
+}
+
+void listarPilha(struct itemPilha *topo)
+{
+    int i = 0;
+    if (topo)
+    {
+        printf("\nPilha: ");
+
+        while (topo)
+        {
+            printf("\n%i => %i", i, topo->dado);
+            topo = topo->proximo;
+            i++;
+        }
+
+        printf("\n");
+    }
+    else
+        printf("\nPilha Vazia");
+}
+
+void removerMultiplos(struct itemPilha  **pilha1, int cont)
+{
+    struct itemPilha *aux1;
+    aux1 = NULL;
+    while (cont > 0)
+    {
+        if ((*pilha1)->dado % 3 == 0)
+        {
+            pop(pilha1);
+            cont--;
+        }
+        else if (cont != 0)
+        {
+            push(&aux1, (*pilha1)->dado);
+            pop(pilha1);
+            cont--;
+        }
+    }
+    *pilha1 = aux1;
+}
+
+void ex1()
+{
+
+    clrscr();
+
+    struct itemPilha *pilha1;
+    int valor = 1;
+    int cont = 0;
+    while (valor != 0)
+    {
+        printf("Digite um valor para armazenar na pilha 1 e zero para finalizar e voltar ao menu principal(0): ");
+        scanf("%i", &valor);
+        if (valor != 0)
+        {
+            cont++;
+            push(&pilha1, valor);
+        }
+    }
+    removerMultiplos(&pilha1, cont);
+    listarPilha(pilha1);
+}
+
+int main()
+{
+
+    int op;
+
+    clrscr();
+
+    do
+    {
+        printf("\nMenu");
+        printf("\n1) Exercicio 1");
+        printf("\n2) Exercicio 2");
+        printf("\n0) Sair do Sistema");
+        printf("\nOpcao: ");
+        scanf("%i", &op);
+
+        switch (op)
+        {
+        case 1:
+            ex1();
+            break;
+        case 2:
+            ex2();
+            break;
+        }
+
+    } while (op != 0);
+
+    return 0;
+}
